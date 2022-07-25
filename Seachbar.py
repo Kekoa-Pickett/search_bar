@@ -48,7 +48,6 @@ class AppDemo(QMainWindow, QtCore.QObject):
 
         tree_view.setModel(treeModel)
         tree_view.expandAll()
-        tree_view.doubleClicked.connect(self.get_value)
         self.setCentralWidget(tree_view)
         self.setContentsMargins(0,30,0,0)
         self.adding_countries()
@@ -85,7 +84,7 @@ class AppDemo(QMainWindow, QtCore.QObject):
 
         self.root_node.sortChildren(0)
 
-    def term_search(self, term = str()):
+    def term_search_key(self, term = str()):
 
         if (term.__len__() < self.termSearchLen):
             for hidden_row in range(self.hidden_rows.rowCount()-1,-1,-1):
@@ -108,20 +107,18 @@ class AppDemo(QMainWindow, QtCore.QObject):
 
     def term_search_enter(self, term = str()):
 
+        root_nodes = self.root_node.rowCount()
         if not (term.startswith(self.search_bar_text)):
             for hidden_row in range(self.hidden_rows.rowCount()-1,-1,-1):
                 country_item = self.hidden_rows.child(hidden_row,0)
                 if (country_item.text().lower().startswith(term.lower())):
-                    country_item.setEnabled(False)
                     self.root_node.appendRow(self.hidden_rows.takeRow(hidden_row))
-
-        for row in range(self.root_node.rowCount()-1,-1,-1):
+                    
+        for row in range(root_nodes -1, -1, -1):
             row_item = self.root_node.child(row, 0)
             if (not row_item.text().lower().startswith(term.lower())):
-                # and row_item.isEnabled()): 
                 # while row_item.chil           while loop inside
                 self.hidden_rows.appendRow(self.root_node.takeRow(row))
-            row_item.setEnabled(True)
 
         self.search_bar_text = term
         self.root_node.sortChildren(0)
@@ -132,11 +129,6 @@ class AppDemo(QMainWindow, QtCore.QObject):
                 self.term_search_enter(self.search_bar.text())
                 return True
         return False
-        
-    def get_value(self, val):
-        print(val.data())
-        print(val.row())
-        print(val.column())
 
     def close(self):
         pass
